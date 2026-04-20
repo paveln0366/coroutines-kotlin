@@ -1,4 +1,4 @@
-package org.example.underTheHood
+package underTheHood
 
 fun main() {
     Display.show()

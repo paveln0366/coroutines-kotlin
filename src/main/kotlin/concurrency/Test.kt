@@ -1,4 +1,4 @@
-package coroutines
+package concurrency
 
 fun main() {
     Display.show()

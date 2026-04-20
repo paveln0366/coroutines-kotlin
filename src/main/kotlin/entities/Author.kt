@@ -1,3 +1,3 @@
-package org.example.entities
+package entities
 
 data class Author(val name: String, val bio: String)

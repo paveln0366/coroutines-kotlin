@@ -1,4 +1,4 @@
-package org.example.callbacks
+package callbacks
 
 fun main() {
     Display.show()

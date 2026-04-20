@@ -1,7 +1,7 @@
-package org.example.callbacks
+package callbacks
 
-import org.example.entities.Author
-import org.example.entities.Book
+import entities.Author
+import entities.Book
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.*

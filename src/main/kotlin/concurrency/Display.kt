@@ -1,7 +1,6 @@
-package coroutines
+package concurrency
 
 import kotlinx.coroutines.*
-import entities.Author
 import entities.Book
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -9,7 +8,6 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.util.concurrent.Executors
 import javax.swing.*
-import kotlin.concurrent.thread
 
 object Display {
 
@@ -22,16 +20,19 @@ object Display {
 
     private val loadButton = JButton("Load Book").apply {
         addActionListener {
+
+            isEnabled = false
+            infoArea.text = "Loading book information...\n"
+
+            val job = mutableListOf<Job>()
+            repeat(10) {
+                scope.launch {
+                    val book = loadBook()
+                    infoArea.append("Book $it: ${book.title}\nYear: ${book.year}\nGenre: ${book.genre}\n\n")
+                }.also { job.add(it) }
+            }
             scope.launch {
-                isEnabled = false
-                infoArea.text = "Loading book information...\n"
-                val book = loadBook()
-                println("Loaded: $book")
-                infoArea.append("Book: ${book.title}\nYear: ${book.year}\nGenre: ${book.genre}\n")
-                infoArea.append("Load author information...\n")
-                val author = loadAuthor(book)
-                println("Author: $author")
-                infoArea.append("Author: ${author.name}\nBiography: ${author.bio}\n")
+                job.joinAll()
                 isEnabled = true
             }
         }
@@ -74,21 +75,14 @@ object Display {
         }
     }
 
-    private suspend fun loadAuthor(book: Book): Author {
-        withContext(Dispatchers.Default) {
-            longOperation()
-        }
-        return Author("George Orwell", "British writer and journalist")
-    }
-
     private fun startTimer() {
-        thread {
+        scope.launch {
             var totalSeconds = 0
             while (true) {
                 val minutes = totalSeconds / 60
                 val seconds = totalSeconds % 60
                 timerLabel.text = String.format("Time: %02d:%02d", minutes, seconds)
-                Thread.sleep(1000)
+                delay(1000)
                 totalSeconds++
             }
         }
