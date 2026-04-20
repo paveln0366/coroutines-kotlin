@@ -1,7 +1,7 @@
 package concurrency
 
-import kotlinx.coroutines.*
 import entities.Book
+import kotlinx.coroutines.*
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
@@ -24,15 +24,17 @@ object Display {
             isEnabled = false
             infoArea.text = "Loading book information...\n"
 
-            val job = mutableListOf<Job>()
+            val jobs = mutableListOf<Deferred<Book>>()
             repeat(10) {
-                scope.launch {
+                scope.async {
                     val book = loadBook()
                     infoArea.append("Book $it: ${book.title}\nYear: ${book.year}\nGenre: ${book.genre}\n\n")
-                }.also { job.add(it) }
+                    book
+                }.let { jobs.add(it) }
             }
             scope.launch {
-                job.joinAll()
+                val books = jobs.awaitAll()
+                println(books.joinToString { ", " })
                 isEnabled = true
             }
         }
